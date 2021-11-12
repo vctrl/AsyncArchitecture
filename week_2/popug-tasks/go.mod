@@ -1,16 +1,8 @@
-module github.com/vctrl/async-architecture/week_2/popug-auth
+module github.com/vctrl/async-architecture/week_2/popug-tasks
 
 go 1.17
 
-require (
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/macinnir/jose v1.1.1
-	github.com/satori/go.uuid v1.2.0
-	github.com/vctrl/async-architecture/week_2/schema v0.0.0-20211109231557-f3e1a85f5c51
-	google.golang.org/grpc v1.42.0
-	gorm.io/driver/postgres v1.2.1
-	gorm.io/gorm v1.22.2
-)
+require github.com/vctrl/async-architecture/week_2/schema v0.0.0-20211111004915-c8568020a852
 
 require (
 	github.com/golang/protobuf v1.5.2 // indirect
@@ -29,7 +21,10 @@ require (
 	golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013 // indirect
+	google.golang.org/grpc v1.42.0 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
+	gorm.io/driver/postgres v1.2.2 // indirect
+	gorm.io/gorm v1.22.2 // indirect
 )
 
 replace github.com/vctrl/async-architecture/week_2/schema => ../schema

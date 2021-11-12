@@ -9,7 +9,7 @@ import (
 )
 
 type Session struct {
-	UserID uint   `json:"user_id"`
+	UserID string `json:"user_id"`
 	Login  string `json:"login"`
 	jwt.StandardClaims
 }
@@ -25,10 +25,12 @@ func NewJwtSessionManager(privateKey *rsa.PrivateKey, publicKey *rsa.PublicKey) 
 	return &JwtSessionManager{
 		privateKey: privateKey,
 		publicKey:  publicKey,
+		accessTTL:  time.Minute,
+		//refreshTTL: 0,
 	}
 }
 
-func (jsm *JwtSessionManager) Create(ctx context.Context, userID uint, login string) (string, error) {
+func (jsm *JwtSessionManager) Create(ctx context.Context, userID string, login string) (string, error) {
 	tn := time.Now()
 	expiresAt := tn.Add(jsm.accessTTL)
 	sess := &Session{
@@ -41,7 +43,7 @@ func (jsm *JwtSessionManager) Create(ctx context.Context, userID uint, login str
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, sess)
-	signed, err := token.SignedString(token)
+	signed, err := token.SignedString(jsm.privateKey)
 	if err != nil {
 		return "", err
 	}

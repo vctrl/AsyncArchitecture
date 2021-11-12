@@ -7,7 +7,6 @@ import (
 	"github.com/vctrl/async-architecture/week_2/popug-auth/internal/model"
 	"github.com/vctrl/async-architecture/week_2/schema/auth"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"io/ioutil"
 )
 
@@ -17,7 +16,7 @@ type server struct {
 }
 
 func New() (*server, error) {
-	// todo config
+	// todo config and relative path
 	bts, err := ioutil.ReadFile("/Users/viktor/Repos/async-architecture/week_2/popug-auth/jwtRS256.key")
 	if err != nil {
 		return nil, err
@@ -63,7 +62,7 @@ func (s *server) CheckSession(ctx context.Context, req *auth.CheckSessionRequest
 			Msg:  "",
 		},
 		Session: &auth.Session{
-			UserId: uint32(resp.UserID),
+			UserId: resp.UserID,
 			Login:  resp.Login,
 		},
 	}, nil
@@ -80,7 +79,7 @@ func (s *server) Register(ctx context.Context, req *auth.RegisterRequest) (*auth
 			Msg:  "",
 		},
 		PublicId: pID,
-		Id:       uint32(id),
+		Id:       id,
 	}, nil
 }
 
@@ -99,14 +98,47 @@ func (s *server) Login(ctx context.Context, r *auth.LoginRequest) (*auth.LoginRe
 	}, nil
 }
 
-func (s *server) GetUserById(context.Context, *auth.GetUserByIdRequest) (*auth.GetUserByIdResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUserById not implemented")
+func (s *server) GetUserById(ctx context.Context, req *auth.GetUserByIdRequest) (*auth.GetUserByIdResponse, error) {
+	user, err := s.Mdl.Users.GetByID(ctx, req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &auth.GetUserByIdResponse{
+		Status: &auth.Status{
+			Code: int32(codes.OK),
+			Msg:  "",
+		},
+		UserInfo: &auth.UserInfo{
+			Login:    &auth.StringContainer{Value: user.Login},
+			Email:    &auth.StringContainer{Value: user.Email},
+			FullName: &auth.StringContainer{Value: user.FullName},
+			Role:     &auth.StringContainer{Value: user.Role},
+		},
+	}, nil
+
 }
 
-func (s *server) UpdateUserById(context.Context, *auth.UpdateUserByIdRequest) (*auth.UpdateUserByIdResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserById not implemented")
+func (s *server) UpdateUserById(ctx context.Context, req *auth.UpdateUserByIdRequest) (*auth.UpdateUserByIdResponse, error) {
+	err := s.Mdl.Users.Update(ctx, req.UserInfo)
+	if err != nil {
+		return nil, err
+	}
+
+	return &auth.UpdateUserByIdResponse{Status: &auth.Status{
+		Code: int32(codes.OK),
+		Msg:  "",
+	}}, nil
 }
 
-func (s *server) DeleteUserById(context.Context, *auth.DeleteUserByIdRequest) (*auth.DeleteUserByIdResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteUserById not implemented")
+func (s *server) DeleteUserById(ctx context.Context, req *auth.DeleteUserByIdRequest) (*auth.DeleteUserByIdResponse, error) {
+	err := s.Mdl.Users.Delete(ctx, req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &auth.DeleteUserByIdResponse{Status: &auth.Status{
+		Code: int32(codes.OK),
+		Msg:  "",
+	}}, nil
 }

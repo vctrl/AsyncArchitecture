@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+package tasks;
+
+service Tasks {
+    rpc Create(CreateRequest) returns (CreateResponse);
+    rpc AssignTo(AssignToRequest) returns (AssignToResponse);
+    rpc CreateAndAssignTo(CreateAndAssignToRequest) returns (CreateAndAssignToResponse);
+
+    rpc MarkAsDone(MarkAsDoneRequest) returns (MarkAsDoneResponse);
+
+    rpc Shuffle(ShuffleRequest) returns (ShuffleResponse);
+
+    rpc GetById(GetByIdRequest) returns (GetByIdResponse);
+    rpc Update(UpdateRequest) returns (UpdateResponse);
+    rpc Delete(DeleteRequest) returns (DeleteResponse);
+}
+
+
+message CreateRequest {
+    TaskInfo task_info = 1;
+}
+
+message CreateResponse {
+    Status status = 1;
+
+    string id = 2;
+}
+
+message AssignToRequest {
+    string task_id = 1;
+
+    string user_id = 2;
+}
+
+message AssignToResponse {
+    Status status = 1;
+}
+
+message CreateAndAssignToRequest {
+    TaskInfo task_info = 1;
+
+    string assign_to_id = 2;
+}
+
+message CreateAndAssignToResponse {
+    Status status = 1;
+
+    string id = 2;
+}
+
+message MarkAsDoneRequest {
+    string task_id = 1;
+}
+
+message MarkAsDoneResponse {
+    Status status = 1;
+}
+
+message ShuffleRequest {}
+
+message ShuffleResponse {
+    Status status = 1;
+}
+
+message GetByIdRequest {
+    string id = 1;
+}
+
+message GetByIdResponse {
+    Status status = 1;
+    TaskInfo task_info = 2;
+}
+
+message UpdateRequest {
+    string id = 1;
+    TaskInfo task_info = 2;
+}
+
+message UpdateResponse {
+    Status status = 1;
+}
+
+message DeleteRequest {
+    string id = 1;
+}
+
+message DeleteResponse {
+    Status status = 1;
+}
+
+message TaskInfo {
+    string Description = 1;
+
+    bool Done = 2;
+}
+
+message Status {
+    int32 code = 1;
+
+    string msg = 2;
+}
+
+// StringContainer нужен для того чтобы отличать отсутствие значения(nil) от пустого значения
+message StringContainer {
+    string value = 1;
+}

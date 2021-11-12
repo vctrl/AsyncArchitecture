@@ -19,6 +19,7 @@ func (m *Model) Login(ctx context.Context, login, password string) (string, erro
 		return "", err
 	}
 
+	// todo danger: password in plain text
 	if password != user.Password {
 		return "", fmt.Errorf("passwords doesn't match")
 	}
@@ -31,10 +32,10 @@ func (m *Model) Login(ctx context.Context, login, password string) (string, erro
 	return token, nil
 }
 
-func (m *Model) Register(ctx context.Context, info *auth.UserInfo) (string, uint, error) {
+func (m *Model) Register(ctx context.Context, info *auth.UserInfo) (string, string, error) {
 	pID, id, err := m.Users.Create(ctx, info.Login.Value, info.Password.Value, info.Email.Value, info.FullName.Value, info.Role.Value)
 	if err != nil {
-		return "", 0, err
+		return "", "", err
 	}
 
 	return pID, id, err
