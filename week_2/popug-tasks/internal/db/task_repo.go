@@ -10,7 +10,6 @@ import (
 
 type Task struct {
 	ID          string `gorm:"primarykey" sql:"type:uuid;primary_key;default:uuid_generate_v4()"`
-	UserID      string
 	PublicID    string
 	AssignedTo  string
 	Description string
@@ -24,6 +23,9 @@ type TaskRepo interface {
 	GetAll(ctx context.Context) ([]*Task, error)
 	GetByID(ctx context.Context, id string) (*Task, error)
 	UpdateAssignedTo(ctx context.Context, task *Task, assignedTo string) error
+
+	Update(ctx context.Context, task *Task) error
+	DeleteByID(ctx context.Context, id string) error
 }
 
 type TaskRepositorySQL struct {
@@ -94,6 +96,24 @@ func (r *TaskRepositorySQL) GetByID(ctx context.Context, id string) (*Task, erro
 
 func (r *TaskRepositorySQL) UpdateAssignedTo(ctx context.Context, task *Task, assignedTo string) error {
 	db := r.db.WithContext(ctx).First(&Task{}, "id = ?", task.ID).Update("assigned_to", assignedTo)
+	if db.Error != nil {
+		return db.Error
+	}
+
+	return nil
+}
+
+func (r *TaskRepositorySQL) Update(ctx context.Context, task *Task) error {
+	db := r.db.WithContext(ctx).First(&Task{}, "id = ?", task.ID).Updates(task)
+	if db.Error != nil {
+		return db.Error
+	}
+
+	return nil
+}
+
+func (r *TaskRepositorySQL) DeleteByID(ctx context.Context, id string) error {
+	db := r.db.WithContext(ctx).Delete(&Task{}, id)
 	if db.Error != nil {
 		return db.Error
 	}

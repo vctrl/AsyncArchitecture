@@ -230,6 +230,291 @@ func (x *UserDeletedEvent) GetPublicId() string {
 	return ""
 }
 
+type TaskCreatedEvent struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	PublicId    string `protobuf:"bytes,1,opt,name=public_id,json=publicId,proto3" json:"public_id,omitempty"`
+	AssignedTo  string `protobuf:"bytes,2,opt,name=assigned_to,json=assignedTo,proto3" json:"assigned_to,omitempty"`
+	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Done        bool   `protobuf:"varint,4,opt,name=done,proto3" json:"done,omitempty"`
+}
+
+func (x *TaskCreatedEvent) Reset() {
+	*x = TaskCreatedEvent{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_events_events_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *TaskCreatedEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TaskCreatedEvent) ProtoMessage() {}
+
+func (x *TaskCreatedEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_events_events_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TaskCreatedEvent.ProtoReflect.Descriptor instead.
+func (*TaskCreatedEvent) Descriptor() ([]byte, []int) {
+	return file_events_events_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *TaskCreatedEvent) GetPublicId() string {
+	if x != nil {
+		return x.PublicId
+	}
+	return ""
+}
+
+func (x *TaskCreatedEvent) GetAssignedTo() string {
+	if x != nil {
+		return x.AssignedTo
+	}
+	return ""
+}
+
+func (x *TaskCreatedEvent) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *TaskCreatedEvent) GetDone() bool {
+	if x != nil {
+		return x.Done
+	}
+	return false
+}
+
+type TaskUpdatedEvent struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	PublicId    *StringContainer `protobuf:"bytes,1,opt,name=public_id,json=publicId,proto3" json:"public_id,omitempty"`
+	AssignedTo  *StringContainer `protobuf:"bytes,2,opt,name=assigned_to,json=assignedTo,proto3" json:"assigned_to,omitempty"`
+	Description *StringContainer `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Done        *BoolContainer   `protobuf:"bytes,4,opt,name=done,proto3" json:"done,omitempty"`
+}
+
+func (x *TaskUpdatedEvent) Reset() {
+	*x = TaskUpdatedEvent{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_events_events_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *TaskUpdatedEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TaskUpdatedEvent) ProtoMessage() {}
+
+func (x *TaskUpdatedEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_events_events_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TaskUpdatedEvent.ProtoReflect.Descriptor instead.
+func (*TaskUpdatedEvent) Descriptor() ([]byte, []int) {
+	return file_events_events_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *TaskUpdatedEvent) GetPublicId() *StringContainer {
+	if x != nil {
+		return x.PublicId
+	}
+	return nil
+}
+
+func (x *TaskUpdatedEvent) GetAssignedTo() *StringContainer {
+	if x != nil {
+		return x.AssignedTo
+	}
+	return nil
+}
+
+func (x *TaskUpdatedEvent) GetDescription() *StringContainer {
+	if x != nil {
+		return x.Description
+	}
+	return nil
+}
+
+func (x *TaskUpdatedEvent) GetDone() *BoolContainer {
+	if x != nil {
+		return x.Done
+	}
+	return nil
+}
+
+type TaskDeletedEvent struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	PublicId string `protobuf:"bytes,1,opt,name=public_id,json=publicId,proto3" json:"public_id,omitempty"`
+}
+
+func (x *TaskDeletedEvent) Reset() {
+	*x = TaskDeletedEvent{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_events_events_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *TaskDeletedEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TaskDeletedEvent) ProtoMessage() {}
+
+func (x *TaskDeletedEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_events_events_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TaskDeletedEvent.ProtoReflect.Descriptor instead.
+func (*TaskDeletedEvent) Descriptor() ([]byte, []int) {
+	return file_events_events_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *TaskDeletedEvent) GetPublicId() string {
+	if x != nil {
+		return x.PublicId
+	}
+	return ""
+}
+
+// StringContainer нужен для того чтобы отличать отсутствие значения(nil) от пустого значения
+type StringContainer struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Value string `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
+}
+
+func (x *StringContainer) Reset() {
+	*x = StringContainer{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_events_events_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *StringContainer) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StringContainer) ProtoMessage() {}
+
+func (x *StringContainer) ProtoReflect() protoreflect.Message {
+	mi := &file_events_events_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StringContainer.ProtoReflect.Descriptor instead.
+func (*StringContainer) Descriptor() ([]byte, []int) {
+	return file_events_events_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *StringContainer) GetValue() string {
+	if x != nil {
+		return x.Value
+	}
+	return ""
+}
+
+// BoolContainer нужен для того чтобы отличать отсутствие значения(nil) от пустого значения
+type BoolContainer struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Value bool `protobuf:"varint,1,opt,name=value,proto3" json:"value,omitempty"`
+}
+
+func (x *BoolContainer) Reset() {
+	*x = BoolContainer{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_events_events_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *BoolContainer) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BoolContainer) ProtoMessage() {}
+
+func (x *BoolContainer) ProtoReflect() protoreflect.Message {
+	mi := &file_events_events_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BoolContainer.ProtoReflect.Descriptor instead.
+func (*BoolContainer) Descriptor() ([]byte, []int) {
+	return file_events_events_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *BoolContainer) GetValue() bool {
+	if x != nil {
+		return x.Value
+	}
+	return false
+}
+
 var File_events_events_proto protoreflect.FileDescriptor
 
 var file_events_events_proto_rawDesc = []byte{
@@ -255,7 +540,37 @@ var file_events_events_proto_rawDesc = []byte{
 	0x6f, 0x6c, 0x65, 0x22, 0x2f, 0x0a, 0x10, 0x55, 0x73, 0x65, 0x72, 0x44, 0x65, 0x6c, 0x65, 0x74,
 	0x65, 0x64, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x12, 0x1b, 0x0a, 0x09, 0x70, 0x75, 0x62, 0x6c, 0x69,
 	0x63, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x70, 0x75, 0x62, 0x6c,
-	0x69, 0x63, 0x49, 0x64, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x69, 0x63, 0x49, 0x64, 0x22, 0x86, 0x01, 0x0a, 0x10, 0x54, 0x61, 0x73, 0x6b, 0x43, 0x72, 0x65,
+	0x61, 0x74, 0x65, 0x64, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x12, 0x1b, 0x0a, 0x09, 0x70, 0x75, 0x62,
+	0x6c, 0x69, 0x63, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x70, 0x75,
+	0x62, 0x6c, 0x69, 0x63, 0x49, 0x64, 0x12, 0x1f, 0x0a, 0x0b, 0x61, 0x73, 0x73, 0x69, 0x67, 0x6e,
+	0x65, 0x64, 0x5f, 0x74, 0x6f, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x61, 0x73, 0x73,
+	0x69, 0x67, 0x6e, 0x65, 0x64, 0x54, 0x6f, 0x12, 0x20, 0x0a, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72,
+	0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x64, 0x65,
+	0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x12, 0x0a, 0x04, 0x64, 0x6f, 0x6e,
+	0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x08, 0x52, 0x04, 0x64, 0x6f, 0x6e, 0x65, 0x22, 0xcc, 0x01,
+	0x0a, 0x10, 0x54, 0x61, 0x73, 0x6b, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x45, 0x76, 0x65,
+	0x6e, 0x74, 0x12, 0x2d, 0x0a, 0x09, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x5f, 0x69, 0x64, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x43, 0x6f,
+	0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x52, 0x08, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x49,
+	0x64, 0x12, 0x31, 0x0a, 0x0b, 0x61, 0x73, 0x73, 0x69, 0x67, 0x6e, 0x65, 0x64, 0x5f, 0x74, 0x6f,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x43,
+	0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x52, 0x0a, 0x61, 0x73, 0x73, 0x69, 0x67, 0x6e,
+	0x65, 0x64, 0x54, 0x6f, 0x12, 0x32, 0x0a, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74,
+	0x69, 0x6f, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x53, 0x74, 0x72, 0x69,
+	0x6e, 0x67, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x52, 0x0b, 0x64, 0x65, 0x73,
+	0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x22, 0x0a, 0x04, 0x64, 0x6f, 0x6e, 0x65,
+	0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0e, 0x2e, 0x42, 0x6f, 0x6f, 0x6c, 0x43, 0x6f, 0x6e,
+	0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x52, 0x04, 0x64, 0x6f, 0x6e, 0x65, 0x22, 0x2f, 0x0a, 0x10,
+	0x54, 0x61, 0x73, 0x6b, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x64, 0x45, 0x76, 0x65, 0x6e, 0x74,
+	0x12, 0x1b, 0x0a, 0x09, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x08, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x49, 0x64, 0x22, 0x27, 0x0a,
+	0x0f, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72,
+	0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0x25, 0x0a, 0x0d, 0x42, 0x6f, 0x6f, 0x6c, 0x43, 0x6f,
+	0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x62, 0x06, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -270,18 +585,27 @@ func file_events_events_proto_rawDescGZIP() []byte {
 	return file_events_events_proto_rawDescData
 }
 
-var file_events_events_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_events_events_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_events_events_proto_goTypes = []interface{}{
 	(*UserCreatedEvent)(nil), // 0: UserCreatedEvent
 	(*UserUpdatedEvent)(nil), // 1: UserUpdatedEvent
 	(*UserDeletedEvent)(nil), // 2: UserDeletedEvent
+	(*TaskCreatedEvent)(nil), // 3: TaskCreatedEvent
+	(*TaskUpdatedEvent)(nil), // 4: TaskUpdatedEvent
+	(*TaskDeletedEvent)(nil), // 5: TaskDeletedEvent
+	(*StringContainer)(nil),  // 6: StringContainer
+	(*BoolContainer)(nil),    // 7: BoolContainer
 }
 var file_events_events_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	6, // 0: TaskUpdatedEvent.public_id:type_name -> StringContainer
+	6, // 1: TaskUpdatedEvent.assigned_to:type_name -> StringContainer
+	6, // 2: TaskUpdatedEvent.description:type_name -> StringContainer
+	7, // 3: TaskUpdatedEvent.done:type_name -> BoolContainer
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_events_events_proto_init() }
@@ -326,6 +650,66 @@ func file_events_events_proto_init() {
 				return nil
 			}
 		}
+		file_events_events_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*TaskCreatedEvent); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_events_events_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*TaskUpdatedEvent); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_events_events_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*TaskDeletedEvent); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_events_events_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*StringContainer); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_events_events_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*BoolContainer); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -333,7 +717,7 @@ func file_events_events_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_events_events_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

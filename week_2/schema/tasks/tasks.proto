@@ -78,9 +78,11 @@ message DeleteResponse {
 }
 
 message TaskInfo {
-    string Description = 1;
+    string AssignedToId = 1;
 
-    bool Done = 2;
+    string Description = 2;
+
+    bool Done = 3;
 }
 
 message Status {

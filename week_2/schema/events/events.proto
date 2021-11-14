@@ -27,3 +27,37 @@ message UserUpdatedEvent {
 message UserDeletedEvent {
     string public_id = 2;
 }
+
+message TaskCreatedEvent {
+    string public_id = 1;
+
+    string assigned_to = 2;
+
+    string description = 3;
+
+    bool done = 4;
+}
+
+message TaskUpdatedEvent {
+    StringContainer public_id = 1;
+
+    StringContainer assigned_to = 2;
+
+    StringContainer description = 3;
+
+    BoolContainer done = 4;
+}
+
+message TaskDeletedEvent {
+    string public_id = 1;
+}
+
+// StringContainer нужен для того чтобы отличать отсутствие значения(nil) от пустого значения
+message StringContainer {
+    string value = 1;
+}
+
+// BoolContainer нужен для того чтобы отличать отсутствие значения(nil) от пустого значения
+message BoolContainer {
+    bool value = 1;
+}

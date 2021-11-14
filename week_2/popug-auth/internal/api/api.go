@@ -13,6 +13,12 @@ import (
 	"io/ioutil"
 )
 
+const (
+	userCreateEventsTopic = "user-create-events"
+	userUpdateEventsTopic = "user-update-events"
+	userDeleteEventsTopic = "user-delete-events"
+)
+
 type server struct {
 	Mdl *model.Model
 	auth.UnimplementedAuthServer
@@ -86,34 +92,18 @@ func (s *server) Register(ctx context.Context, req *auth.RegisterRequest) (*auth
 
 	user, err := s.Mdl.Users.GetByID(ctx, id)
 	if err != nil {
-
+		return nil, err
 	}
 
-	topic := "user-create-events"
-
-	msg, err := proto.Marshal(&events.UserCreatedEvent{
+	msg := &events.UserCreatedEvent{
 		PublicId: user.PublicID,
 		Login:    user.Login,
 		Email:    user.Email,
 		FullName: user.FullName,
 		Role:     user.Role,
-	})
-
-	if err != nil {
-		return nil, err
 	}
 
-	err = s.Mdl.Producer.Produce(&kafka.Message{
-		TopicPartition: kafka.TopicPartition{
-			Topic:     &topic,
-			Partition: 0,
-			Offset:    0,
-			Metadata:  nil,
-			Error:     nil,
-		},
-		Value: msg,
-	}, nil)
-
+	err = s.produce(msg, userCreateEventsTopic)
 	if err != nil {
 		return nil, err
 	}
@@ -178,31 +168,15 @@ func (s *server) UpdateUserById(ctx context.Context, req *auth.UpdateUserByIdReq
 		return nil, err
 	}
 
-	// todo send only updated fields
-	msg, err := proto.Marshal(&events.UserUpdatedEvent{
+	msg := &events.UserUpdatedEvent{
 		PublicId: user.PublicID,
 		Login:    user.Login,
 		Email:    user.Email,
 		FullName: user.FullName,
 		Role:     user.Role,
-	})
-
-	if err != nil {
-		return nil, err
 	}
 
-	topic := "topic-update-events"
-	err = s.Mdl.Producer.Produce(&kafka.Message{
-		TopicPartition: kafka.TopicPartition{
-			Topic:     &topic,
-			Partition: 0,
-			Offset:    0,
-			Metadata:  nil,
-			Error:     nil,
-		},
-		Value: msg,
-	}, nil)
-
+	err = s.produce(msg, userUpdateEventsTopic)
 	if err != nil {
 		return nil, err
 	}
@@ -220,21 +194,11 @@ func (s *server) DeleteUserById(ctx context.Context, req *auth.DeleteUserByIdReq
 		return nil, err
 	}
 
-	msg, err := proto.Marshal(&events.UserDeletedEvent{
+	msg := &events.UserDeletedEvent{
 		PublicId: req.Id,
-	})
+	}
 
-	topic := "user-delete-events"
-	err = s.Mdl.Producer.Produce(&kafka.Message{
-		TopicPartition: kafka.TopicPartition{
-			Topic:     &topic,
-			Partition: 0,
-			Offset:    0,
-			Metadata:  nil,
-			Error:     nil,
-		},
-		Value: msg,
-	}, nil)
+	err = s.produce(msg, userDeleteEventsTopic)
 
 	if err != nil {
 		return nil, err
@@ -244,4 +208,26 @@ func (s *server) DeleteUserById(ctx context.Context, req *auth.DeleteUserByIdReq
 		Code: int32(codes.OK),
 		Msg:  "",
 	}}, nil
+}
+
+func (s *server) produce(msg proto.Message, topic string) error {
+	evt, err := proto.Marshal(msg)
+	if err != nil {
+		return err
+	}
+
+	err = s.Mdl.Producer.Produce(&kafka.Message{
+		TopicPartition: kafka.TopicPartition{
+			Topic:     &topic,
+			Partition: 0,
+			Offset:    0,
+		},
+		Value: evt,
+	}, nil)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
