@@ -2,11 +2,14 @@ package api
 
 import (
 	"context"
+	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/macinnir/jose/crypto"
 	"github.com/vctrl/async-architecture/week_2/popug-auth/internal/db"
 	"github.com/vctrl/async-architecture/week_2/popug-auth/internal/model"
 	"github.com/vctrl/async-architecture/week_2/schema/auth"
+	"github.com/vctrl/async-architecture/week_2/schema/events"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/proto"
 	"io/ioutil"
 )
 
@@ -15,7 +18,8 @@ type server struct {
 	auth.UnimplementedAuthServer
 }
 
-func New() (*server, error) {
+// todo abstract config
+func New(dsn string, kafkaCfg *kafka.ConfigMap) (*server, error) {
 	// todo config and relative path
 	bts, err := ioutil.ReadFile("/Users/viktor/Repos/async-architecture/week_2/popug-auth/jwtRS256.key")
 	if err != nil {
@@ -42,9 +46,15 @@ func New() (*server, error) {
 		panic("failed to connect database")
 	}
 
+	p, err := kafka.NewProducer(kafkaCfg)
+	if err != nil {
+		panic(err)
+	}
+
 	mdl := &model.Model{
-		Sm:    sm,
-		Users: db.NewUserRepoSQL("test.db"),
+		Sm:       sm,
+		Users:    db.NewUserRepoSQL(dsn),
+		Producer: p,
 	}
 
 	return &server{Mdl: mdl}, nil
@@ -73,6 +83,41 @@ func (s *server) Register(ctx context.Context, req *auth.RegisterRequest) (*auth
 	if err != nil {
 		return nil, err
 	}
+
+	user, err := s.Mdl.Users.GetByID(ctx, id)
+	if err != nil {
+
+	}
+
+	topic := "user-create-events"
+
+	msg, err := proto.Marshal(&events.UserCreatedEvent{
+		PublicId: user.PublicID,
+		Login:    user.Login,
+		Email:    user.Email,
+		FullName: user.FullName,
+		Role:     user.Role,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.Mdl.Producer.Produce(&kafka.Message{
+		TopicPartition: kafka.TopicPartition{
+			Topic:     &topic,
+			Partition: 0,
+			Offset:    0,
+			Metadata:  nil,
+			Error:     nil,
+		},
+		Value: msg,
+	}, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
 	return &auth.RegisterResponse{
 		Status: &auth.Status{
 			Code: int32(codes.OK),
@@ -120,11 +165,47 @@ func (s *server) GetUserById(ctx context.Context, req *auth.GetUserByIdRequest) 
 }
 
 func (s *server) UpdateUserById(ctx context.Context, req *auth.UpdateUserByIdRequest) (*auth.UpdateUserByIdResponse, error) {
+	// todo model method
+	// todo return updated data
 	err := s.Mdl.Users.Update(ctx, req.UserInfo)
 	if err != nil {
 		return nil, err
 	}
 
+	user, err := s.Mdl.Users.GetByID(ctx, req.Id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// todo send only updated fields
+	msg, err := proto.Marshal(&events.UserUpdatedEvent{
+		PublicId: user.PublicID,
+		Login:    user.Login,
+		Email:    user.Email,
+		FullName: user.FullName,
+		Role:     user.Role,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	topic := "topic-update-events"
+	err = s.Mdl.Producer.Produce(&kafka.Message{
+		TopicPartition: kafka.TopicPartition{
+			Topic:     &topic,
+			Partition: 0,
+			Offset:    0,
+			Metadata:  nil,
+			Error:     nil,
+		},
+		Value: msg,
+	}, nil)
+
+	if err != nil {
+		return nil, err
+	}
 	return &auth.UpdateUserByIdResponse{Status: &auth.Status{
 		Code: int32(codes.OK),
 		Msg:  "",
@@ -132,7 +213,29 @@ func (s *server) UpdateUserById(ctx context.Context, req *auth.UpdateUserByIdReq
 }
 
 func (s *server) DeleteUserById(ctx context.Context, req *auth.DeleteUserByIdRequest) (*auth.DeleteUserByIdResponse, error) {
+	// todo model method
+	// todo return id of deleted
 	err := s.Mdl.Users.Delete(ctx, req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	msg, err := proto.Marshal(&events.UserDeletedEvent{
+		PublicId: req.Id,
+	})
+
+	topic := "user-delete-events"
+	err = s.Mdl.Producer.Produce(&kafka.Message{
+		TopicPartition: kafka.TopicPartition{
+			Topic:     &topic,
+			Partition: 0,
+			Offset:    0,
+			Metadata:  nil,
+			Error:     nil,
+		},
+		Value: msg,
+	}, nil)
+
 	if err != nil {
 		return nil, err
 	}

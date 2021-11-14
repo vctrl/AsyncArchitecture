@@ -76,3 +76,12 @@ func (r *UserRepositorySQL) IsExist(ctx context.Context, id string) (bool, error
 
 	return true, nil
 }
+
+func (r *UserRepositorySQL) Create(ctx context.Context, user *User) error {
+	db := r.db.WithContext(ctx).Create(user)
+	if db.Error != nil {
+		return db.Error
+	}
+
+	return nil
+}

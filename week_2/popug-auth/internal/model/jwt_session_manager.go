@@ -25,7 +25,7 @@ func NewJwtSessionManager(privateKey *rsa.PrivateKey, publicKey *rsa.PublicKey) 
 	return &JwtSessionManager{
 		privateKey: privateKey,
 		publicKey:  publicKey,
-		accessTTL:  time.Minute,
+		accessTTL:  time.Hour * 24,
 		//refreshTTL: 0,
 	}
 }

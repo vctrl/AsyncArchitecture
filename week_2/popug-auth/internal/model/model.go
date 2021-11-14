@@ -3,14 +3,16 @@ package model
 import (
 	"context"
 	"fmt"
+	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/vctrl/async-architecture/week_2/popug-auth/internal/db"
 	"github.com/vctrl/async-architecture/week_2/schema/auth"
 )
 
 // Model слой бизнес-логики
 type Model struct {
-	Sm    SessionManager
-	Users db.UserRepo
+	Sm       SessionManager
+	Users    db.UserRepo
+	Producer *kafka.Producer
 }
 
 func (m *Model) Login(ctx context.Context, login, password string) (string, error) {

@@ -55,7 +55,7 @@ func (r *TaskRepositorySQL) Create(ctx context.Context, task *Task) (publicID st
 
 func (r *TaskRepositorySQL) AssignTo(ctx context.Context, taskID, userID string) error {
 	var task Task
-	db := r.db.WithContext(ctx).First(&task, "id = ?", taskID).Update("user_id", userID)
+	db := r.db.WithContext(ctx).First(&task, "id = ?", taskID).Update("assigned_to", userID)
 	if db.Error != nil {
 		return db.Error
 	}
@@ -74,7 +74,7 @@ func (r *TaskRepositorySQL) GetAll(ctx context.Context) ([]*Task, error) {
 }
 
 func (r *TaskRepositorySQL) SetDone(ctx context.Context, taskID string) error {
-	db := r.db.WithContext(ctx).First(&Task{}, taskID).Update("done", true)
+	db := r.db.WithContext(ctx).First(&Task{}, "id = ?", taskID).Update("done", true)
 	if db.Error != nil {
 		return db.Error
 	}
@@ -93,7 +93,7 @@ func (r *TaskRepositorySQL) GetByID(ctx context.Context, id string) (*Task, erro
 }
 
 func (r *TaskRepositorySQL) UpdateAssignedTo(ctx context.Context, task *Task, assignedTo string) error {
-	db := r.db.WithContext(ctx).First(&Task{}, task.ID).Update("assigned_to", assignedTo)
+	db := r.db.WithContext(ctx).First(&Task{}, "id = ?", task.ID).Update("assigned_to", assignedTo)
 	if db.Error != nil {
 		return db.Error
 	}

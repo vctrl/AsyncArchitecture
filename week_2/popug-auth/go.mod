@@ -13,6 +13,7 @@ require (
 )
 
 require (
+	github.com/confluentinc/confluent-kafka-go v1.7.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.10.0 // indirect

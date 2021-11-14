@@ -140,7 +140,7 @@ func main() {
 	// users
 	r.GET("/api/v1/user/:id", func(c *gin.Context) {
 		id := c.Param("id")
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 		defer cancel()
 		resp, err := gw.authClient.GetUserById(ctx, &auth.GetUserByIdRequest{Id: id})
 		if err != nil {
@@ -160,7 +160,7 @@ func main() {
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 		defer cancel()
 		gw.authClient.UpdateUserById(ctx, &auth.UpdateUserByIdRequest{
 			Id: id,
@@ -176,7 +176,7 @@ func main() {
 
 	r.DELETE("/api/v1/user/:id", func(c *gin.Context) {
 		id := c.Param("id")
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 		defer cancel()
 		resp, err := gw.authClient.DeleteUserById(ctx, &auth.DeleteUserByIdRequest{Id: id})
 		if err != nil {
@@ -206,7 +206,7 @@ func main() {
 			return
 		}
 
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 		defer cancel()
 		resp, err := gw.tasksClient.CreateAndAssignTo(ctx, &tasks.CreateAndAssignToRequest{
 			TaskInfo: &tasks.TaskInfo{
@@ -230,7 +230,7 @@ func main() {
 	})
 
 	r.POST("/api/v1/tasks/shuffle", func(c *gin.Context) {
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 		defer cancel()
 		resp, err := gw.tasksClient.Shuffle(ctx, &tasks.ShuffleRequest{})
 		// todo move error handling to func
@@ -249,34 +249,10 @@ func main() {
 
 	r.POST("/api/v1/task/:id/done", func(c *gin.Context) {
 		id := c.Param("id")
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 		defer cancel()
 
 		resp, err := gw.tasksClient.MarkAsDone(ctx, &tasks.MarkAsDoneRequest{TaskId: id})
-		if err != nil {
-			c.AbortWithStatus(http.StatusInternalServerError)
-			return
-		}
-
-		if resp.Status.GetCode() != int32(codes.OK) {
-			c.AbortWithStatus(http.StatusInternalServerError)
-			return
-		}
-
-		c.Status(http.StatusOK)
-		return
-	})
-
-	r.POST("/api/v1/task/:task_id/assign/:user_id", func(c *gin.Context) {
-		taskID := c.Param("task_id")
-		userID := c.Param("user_id")
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-		defer cancel()
-		resp, err := gw.tasksClient.AssignTo(ctx, &tasks.AssignToRequest{
-			TaskId: taskID,
-			UserId: userID,
-		})
-
 		if err != nil {
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
