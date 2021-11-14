@@ -1,11 +1,12 @@
 package main
 
 import (
+	"log"
+	"net"
+
 	"github.com/vctrl/async-architecture/week_2/popug-tasks/internal/api"
 	"github.com/vctrl/async-architecture/week_2/schema/tasks"
 	"google.golang.org/grpc"
-	"log"
-	"net"
 )
 
 func main() {
@@ -15,7 +16,8 @@ func main() {
 	}
 
 	srv := grpc.NewServer()
-	impl := api.NewServer()
+
+	impl := api.New("host=localhost user=postgres password=password dbname=gorm port=5432 sslmode=disable TimeZone=Asia/Shanghai")
 	tasks.RegisterTasksServer(srv, impl)
 
 	if err := srv.Serve(lis); err != nil {

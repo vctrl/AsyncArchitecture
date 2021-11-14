@@ -3,38 +3,16 @@ syntax = "proto3";
 package tasks;
 
 service Tasks {
-    rpc Create(CreateRequest) returns (CreateResponse);
-    rpc AssignTo(AssignToRequest) returns (AssignToResponse);
     rpc CreateAndAssignTo(CreateAndAssignToRequest) returns (CreateAndAssignToResponse);
 
     rpc MarkAsDone(MarkAsDoneRequest) returns (MarkAsDoneResponse);
 
     rpc Shuffle(ShuffleRequest) returns (ShuffleResponse);
 
+    rpc GetAll(GetAllRequest) returns (GetAllResponse);
     rpc GetById(GetByIdRequest) returns (GetByIdResponse);
     rpc Update(UpdateRequest) returns (UpdateResponse);
     rpc Delete(DeleteRequest) returns (DeleteResponse);
-}
-
-
-message CreateRequest {
-    TaskInfo task_info = 1;
-}
-
-message CreateResponse {
-    Status status = 1;
-
-    string id = 2;
-}
-
-message AssignToRequest {
-    string task_id = 1;
-
-    string user_id = 2;
-}
-
-message AssignToResponse {
-    Status status = 1;
 }
 
 message CreateAndAssignToRequest {
@@ -46,7 +24,9 @@ message CreateAndAssignToRequest {
 message CreateAndAssignToResponse {
     Status status = 1;
 
-    string id = 2;
+    string public_id = 2;
+
+    string id = 3;
 }
 
 message MarkAsDoneRequest {
@@ -61,6 +41,14 @@ message ShuffleRequest {}
 
 message ShuffleResponse {
     Status status = 1;
+}
+
+message GetAllRequest { }
+
+message GetAllResponse {
+    Status status = 1;
+
+    repeated TaskInfo tasks = 2;
 }
 
 message GetByIdRequest {

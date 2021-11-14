@@ -38,6 +38,7 @@ type UserRepoSQL struct {
 func NewUserRepoSQL(dsn string) *UserRepoSQL {
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
+		// todo don't panic
 		panic("failed to connect database")
 	}
 

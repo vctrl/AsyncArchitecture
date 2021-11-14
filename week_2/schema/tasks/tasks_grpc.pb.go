@@ -18,11 +18,10 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TasksClient interface {
-	Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error)
-	AssignTo(ctx context.Context, in *AssignToRequest, opts ...grpc.CallOption) (*AssignToResponse, error)
 	CreateAndAssignTo(ctx context.Context, in *CreateAndAssignToRequest, opts ...grpc.CallOption) (*CreateAndAssignToResponse, error)
 	MarkAsDone(ctx context.Context, in *MarkAsDoneRequest, opts ...grpc.CallOption) (*MarkAsDoneResponse, error)
 	Shuffle(ctx context.Context, in *ShuffleRequest, opts ...grpc.CallOption) (*ShuffleResponse, error)
+	GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
 	GetById(ctx context.Context, in *GetByIdRequest, opts ...grpc.CallOption) (*GetByIdResponse, error)
 	Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*UpdateResponse, error)
 	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
@@ -34,24 +33,6 @@ type tasksClient struct {
 
 func NewTasksClient(cc grpc.ClientConnInterface) TasksClient {
 	return &tasksClient{cc}
-}
-
-func (c *tasksClient) Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error) {
-	out := new(CreateResponse)
-	err := c.cc.Invoke(ctx, "/tasks.Tasks/Create", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *tasksClient) AssignTo(ctx context.Context, in *AssignToRequest, opts ...grpc.CallOption) (*AssignToResponse, error) {
-	out := new(AssignToResponse)
-	err := c.cc.Invoke(ctx, "/tasks.Tasks/AssignTo", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *tasksClient) CreateAndAssignTo(ctx context.Context, in *CreateAndAssignToRequest, opts ...grpc.CallOption) (*CreateAndAssignToResponse, error) {
@@ -75,6 +56,15 @@ func (c *tasksClient) MarkAsDone(ctx context.Context, in *MarkAsDoneRequest, opt
 func (c *tasksClient) Shuffle(ctx context.Context, in *ShuffleRequest, opts ...grpc.CallOption) (*ShuffleResponse, error) {
 	out := new(ShuffleResponse)
 	err := c.cc.Invoke(ctx, "/tasks.Tasks/Shuffle", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tasksClient) GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*GetAllResponse, error) {
+	out := new(GetAllResponse)
+	err := c.cc.Invoke(ctx, "/tasks.Tasks/GetAll", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -112,11 +102,10 @@ func (c *tasksClient) Delete(ctx context.Context, in *DeleteRequest, opts ...grp
 // All implementations must embed UnimplementedTasksServer
 // for forward compatibility
 type TasksServer interface {
-	Create(context.Context, *CreateRequest) (*CreateResponse, error)
-	AssignTo(context.Context, *AssignToRequest) (*AssignToResponse, error)
 	CreateAndAssignTo(context.Context, *CreateAndAssignToRequest) (*CreateAndAssignToResponse, error)
 	MarkAsDone(context.Context, *MarkAsDoneRequest) (*MarkAsDoneResponse, error)
 	Shuffle(context.Context, *ShuffleRequest) (*ShuffleResponse, error)
+	GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error)
 	GetById(context.Context, *GetByIdRequest) (*GetByIdResponse, error)
 	Update(context.Context, *UpdateRequest) (*UpdateResponse, error)
 	Delete(context.Context, *DeleteRequest) (*DeleteResponse, error)
@@ -127,12 +116,6 @@ type TasksServer interface {
 type UnimplementedTasksServer struct {
 }
 
-func (UnimplementedTasksServer) Create(context.Context, *CreateRequest) (*CreateResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
-}
-func (UnimplementedTasksServer) AssignTo(context.Context, *AssignToRequest) (*AssignToResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AssignTo not implemented")
-}
 func (UnimplementedTasksServer) CreateAndAssignTo(context.Context, *CreateAndAssignToRequest) (*CreateAndAssignToResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateAndAssignTo not implemented")
 }
@@ -141,6 +124,9 @@ func (UnimplementedTasksServer) MarkAsDone(context.Context, *MarkAsDoneRequest) 
 }
 func (UnimplementedTasksServer) Shuffle(context.Context, *ShuffleRequest) (*ShuffleResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Shuffle not implemented")
+}
+func (UnimplementedTasksServer) GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAll not implemented")
 }
 func (UnimplementedTasksServer) GetById(context.Context, *GetByIdRequest) (*GetByIdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetById not implemented")
@@ -162,42 +148,6 @@ type UnsafeTasksServer interface {
 
 func RegisterTasksServer(s grpc.ServiceRegistrar, srv TasksServer) {
 	s.RegisterService(&Tasks_ServiceDesc, srv)
-}
-
-func _Tasks_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(TasksServer).Create(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/tasks.Tasks/Create",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TasksServer).Create(ctx, req.(*CreateRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Tasks_AssignTo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AssignToRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(TasksServer).AssignTo(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/tasks.Tasks/AssignTo",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TasksServer).AssignTo(ctx, req.(*AssignToRequest))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _Tasks_CreateAndAssignTo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -250,6 +200,24 @@ func _Tasks_Shuffle_Handler(srv interface{}, ctx context.Context, dec func(inter
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TasksServer).Shuffle(ctx, req.(*ShuffleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Tasks_GetAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAllRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TasksServer).GetAll(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/tasks.Tasks/GetAll",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TasksServer).GetAll(ctx, req.(*GetAllRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -316,14 +284,6 @@ var Tasks_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*TasksServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Create",
-			Handler:    _Tasks_Create_Handler,
-		},
-		{
-			MethodName: "AssignTo",
-			Handler:    _Tasks_AssignTo_Handler,
-		},
-		{
 			MethodName: "CreateAndAssignTo",
 			Handler:    _Tasks_CreateAndAssignTo_Handler,
 		},
@@ -334,6 +294,10 @@ var Tasks_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Shuffle",
 			Handler:    _Tasks_Shuffle_Handler,
+		},
+		{
+			MethodName: "GetAll",
+			Handler:    _Tasks_GetAll_Handler,
 		},
 		{
 			MethodName: "GetById",
