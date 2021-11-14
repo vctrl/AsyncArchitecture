@@ -19,11 +19,9 @@ type Task struct {
 type TaskRepo interface {
 	Create(ctx context.Context, task *Task) (string, string, error)
 	AssignTo(ctx context.Context, taskID, userID string) error
-	SetDone(ctx context.Context, taskID string) error
+	Completed(ctx context.Context, taskID string) error
 	GetAll(ctx context.Context) ([]*Task, error)
 	GetByID(ctx context.Context, id string) (*Task, error)
-	UpdateAssignedTo(ctx context.Context, task *Task, assignedTo string) error
-
 	Update(ctx context.Context, task *Task) error
 	DeleteByID(ctx context.Context, id string) error
 }
@@ -75,7 +73,7 @@ func (r *TaskRepositorySQL) GetAll(ctx context.Context) ([]*Task, error) {
 	return tasks, nil
 }
 
-func (r *TaskRepositorySQL) SetDone(ctx context.Context, taskID string) error {
+func (r *TaskRepositorySQL) Completed(ctx context.Context, taskID string) error {
 	db := r.db.WithContext(ctx).First(&Task{}, "id = ?", taskID).Update("done", true)
 	if db.Error != nil {
 		return db.Error
@@ -92,15 +90,6 @@ func (r *TaskRepositorySQL) GetByID(ctx context.Context, id string) (*Task, erro
 	}
 
 	return &task, nil
-}
-
-func (r *TaskRepositorySQL) UpdateAssignedTo(ctx context.Context, task *Task, assignedTo string) error {
-	db := r.db.WithContext(ctx).First(&Task{}, "id = ?", task.ID).Update("assigned_to", assignedTo)
-	if db.Error != nil {
-		return db.Error
-	}
-
-	return nil
 }
 
 func (r *TaskRepositorySQL) Update(ctx context.Context, task *Task) error {

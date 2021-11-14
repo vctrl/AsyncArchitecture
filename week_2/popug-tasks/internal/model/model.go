@@ -35,7 +35,7 @@ func (m *Model) Shuffle(ctx context.Context) ([]*NewTaskAssignedTo, error) {
 	for _, task := range tasks {
 		randomUserID := ids[rand.Intn(len(ids))]
 		// todo one transaction
-		err := m.Tasks.UpdateAssignedTo(ctx, task, randomUserID)
+		err := m.Tasks.AssignTo(ctx, task.ID, randomUserID)
 		if err != nil {
 			return nil, err
 		}
@@ -69,7 +69,7 @@ func (m *Model) CreateAndAssignTo(ctx context.Context, description, assignTo str
 }
 
 func (m *Model) MarkAsDone(ctx context.Context, id string) error {
-	err := m.Tasks.SetDone(ctx, id)
+	err := m.Tasks.Completed(ctx, id)
 	if err != nil {
 		return err
 	}
