@@ -1,0 +1,108 @@
+syntax = "proto3";
+
+package auth;
+
+service Auth {
+    rpc CheckSession(CheckSessionRequest) returns (CheckSessionResponse);
+
+    rpc Register(RegisterRequest) returns (RegisterResponse);
+
+    rpc Login(LoginRequest) returns (LoginResponse);
+
+    rpc GetUserById(GetUserByIdRequest) returns (GetUserByIdResponse);
+
+    rpc UpdateUserById(UpdateUserByIdRequest) returns (UpdateUserByIdResponse);
+
+    rpc DeleteUserById(DeleteUserByIdRequest) returns (DeleteUserByIdResponse);
+}
+
+message CheckSessionRequest {
+    string token = 1;
+}
+
+message CheckSessionResponse {
+    Status status = 1;
+
+    Session session = 2;
+}
+
+message Session {
+    string user_id = 1;
+
+    string login = 2;
+}
+
+message RegisterRequest {
+    UserInfo user_info = 1;
+}
+
+message RegisterResponse {
+    Status status = 1;
+
+    string public_id = 2;
+
+    string id = 3;
+}
+
+message LoginRequest {
+    string login = 1;
+
+    string password = 2;
+}
+
+message LoginResponse {
+    Status status = 1;
+
+    string token = 2;
+}
+
+message GetUserByIdRequest {
+    string id = 1;
+}
+
+message GetUserByIdResponse {
+    Status status = 1;
+
+    UserInfo user_info = 2;
+}
+
+message UpdateUserByIdRequest {
+    string id = 1;
+
+    UserInfo user_info = 2;
+}
+
+message UpdateUserByIdResponse {
+    Status status = 1;
+}
+
+message DeleteUserByIdRequest {
+    string id = 1;
+}
+
+message DeleteUserByIdResponse {
+    Status status = 1;
+}
+
+message UserInfo {
+    StringContainer login = 1;
+
+    StringContainer password = 2;
+
+    StringContainer email = 3;
+
+    StringContainer full_name = 4;
+
+    StringContainer role = 5;
+}
+
+message Status {
+    int32 code = 1;
+
+    string msg = 2;
+}
+
+// StringContainer нужен для того чтобы отличать отсутствие значения(nil) от пустого значения
+message StringContainer {
+    string value = 1;
+}
