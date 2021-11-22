@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+service Billing {
+    rpc CreateTransaction(CreateTransactionRequest) returns (CreateTransactionResponse);
+
+    rpc CloseBillingCycle(CloseBillingCycleRequest) returns (CloseBillingCycleResponse);
+}
+
+message CreateTransactionRequest {
+    string UserId = 1;
+
+    string TaskId = 2;
+
+    int64 Amount = 3;
+}
+
+message CreateTransactionResponse {
+    Status status = 1;
+}
+
+message CloseBillingCycleRequest {
+
+}
+
+message CloseBillingCycleResponse {
+    Status status = 1;
+}
+
+message Status {
+    int32 code = 1;
+
+    string msg = 2;
+}
