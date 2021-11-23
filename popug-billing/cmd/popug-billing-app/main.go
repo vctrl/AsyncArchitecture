@@ -1,9 +1,14 @@
 package main
 
 func main() {
-	// тут мы реализуем старт грпц-сервиса и подписку на события создания/завершения тасков,
-	// с последующим вызовом создания соответствующих транзакций
-
-	// а также подписку на событие завершения цикла биллинга
-	// при поступлении события мы вызываем завершение цикла
+	//lis, err := net.Listen("tcp", ":8881")
+	//if err != nil {
+	//	log.Fatalf("failed to listen: %v", err)
+	//}
+	//
+	//srv := grpc.NewServer()
+	//
+	//postgresDsn := "host=localhost user=postgres password=password dbname=tasks port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+	//
+	//impl := api.New()
 }

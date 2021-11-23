@@ -78,11 +78,16 @@ message DeleteResponse {
 }
 
 message TaskInfo {
-    string AssignedToId = 1;
+    string assigned_to_id = 1;
 
-    string Description = 2;
+    // deprecated: use jira_id and title instead.
+    string description = 2;
 
-    bool Done = 3;
+    bool done = 3;
+
+    string jira_id = 4;
+
+    string title = 5;
 }
 
 message Status {
@@ -94,4 +99,8 @@ message Status {
 // StringContainer нужен для того чтобы отличать отсутствие значения(nil) от пустого значения
 message StringContainer {
     string value = 1;
+}
+
+message BoolContainer {
+    bool value = 1;
 }

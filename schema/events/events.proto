@@ -1,6 +1,8 @@
 syntax = "proto3";
 
 message UserCreatedEvent {
+    Meta meta = 1;
+
     string public_id = 2;
 
     string login = 3;
@@ -13,6 +15,8 @@ message UserCreatedEvent {
 }
 
 message UserUpdatedEvent {
+    Meta meta = 1;
+
     string public_id = 2;
 
     string login = 3;
@@ -25,31 +29,55 @@ message UserUpdatedEvent {
 }
 
 message UserDeletedEvent {
+    Meta meta = 1;
+
     string public_id = 2;
 }
 
 message TaskCreatedEvent {
-    string public_id = 1;
+    Meta meta = 1;
 
-    string assigned_to = 2;
+    string public_id = 2;
 
-    string description = 3;
+    string assigned_to = 3;
 
-    bool done = 4;
+    // deprecated: use jira_id and title instead.
+    string description = 4;
+
+    bool done = 5;
+
+    string jira_id = 6;
+
+    string title = 7;
 }
 
 message TaskUpdatedEvent {
-    StringContainer public_id = 1;
+    Meta meta = 1;
 
-    StringContainer assigned_to = 2;
+    StringContainer public_id = 2;
 
-    StringContainer description = 3;
+    StringContainer assigned_to = 3;
 
-    BoolContainer done = 4;
+    // deprecated: use jira_id and title instead.
+    StringContainer description = 4;
+
+    BoolContainer done = 5;
+
+    StringContainer jira_id = 6;
+
+    StringContainer title = 7;
 }
 
 message TaskDeletedEvent {
-    string public_id = 1;
+    Meta meta = 1;
+
+    string public_id = 2;
+}
+
+message TaskCompletedEvent {
+    Meta meta = 1;
+
+    string public_id = 2;
 }
 
 // StringContainer нужен для того чтобы отличать отсутствие значения(nil) от пустого значения
@@ -60,4 +88,15 @@ message StringContainer {
 // BoolContainer нужен для того чтобы отличать отсутствие значения(nil) от пустого значения
 message BoolContainer {
     bool value = 1;
+}
+
+// Meta служебная информация о событии
+message Meta {
+    string event_id = 1;
+
+    string event_name = 2;
+
+    int64 event_time = 3;
+
+    string producer = 4;
 }

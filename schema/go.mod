@@ -1,4 +1,4 @@
-module github.com/vctrl/async-architecture/week_2/schema
+module github.com/vctrl/async-architecture/schema
 
 go 1.17
 

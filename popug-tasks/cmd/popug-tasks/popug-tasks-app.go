@@ -8,10 +8,10 @@ import (
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/golang/protobuf/proto"
-	"github.com/vctrl/async-architecture/week_2/popug-tasks/internal/api"
-	"github.com/vctrl/async-architecture/week_2/popug-tasks/internal/db"
-	"github.com/vctrl/async-architecture/week_2/schema/events"
-	"github.com/vctrl/async-architecture/week_2/schema/tasks"
+	"github.com/vctrl/async-architecture/popug-tasks/internal/api"
+	"github.com/vctrl/async-architecture/popug-tasks/internal/db"
+	"github.com/vctrl/async-architecture/schema/events"
+	"github.com/vctrl/async-architecture/schema/tasks"
 	"google.golang.org/grpc"
 )
 
