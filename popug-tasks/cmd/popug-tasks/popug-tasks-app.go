@@ -27,6 +27,7 @@ func main() {
 	impl := api.New(postgresDsn)
 	tasks.RegisterTasksServer(srv, impl)
 
+	// todo one channel per topic and multiplex them with select
 	msgCh := make(chan *kafka.Message)
 
 	// handling events

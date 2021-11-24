@@ -5,10 +5,10 @@ import (
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/golang/protobuf/proto"
-	"github.com/vctrl/async-architecture/week_2/popug-tasks/internal/db"
-	"github.com/vctrl/async-architecture/week_2/popug-tasks/internal/model"
-	"github.com/vctrl/async-architecture/week_2/schema/events"
-	"github.com/vctrl/async-architecture/week_2/schema/tasks"
+	"github.com/vctrl/async-architecture/popug-tasks/internal/db"
+	"github.com/vctrl/async-architecture/popug-tasks/internal/model"
+	"github.com/vctrl/async-architecture/schema/events"
+	"github.com/vctrl/async-architecture/schema/tasks"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -17,6 +17,7 @@ const (
 	createTaskTopic = "create-task-events"
 	updateTaskTopic = "update-task-events"
 	deleteTaskTopic = "delete-task-events"
+	assignTaskTopic = "assign-task-events"
 )
 
 type server struct {
@@ -52,6 +53,15 @@ func (s *server) CreateAndAssignTo(ctx context.Context, req *tasks.CreateAndAssi
 	}
 
 	err = s.produce(msg, createTaskTopic)
+	if err != nil {
+		return nil, err
+	}
+
+	msg := &events.TaskAssignedEvent{
+
+	}
+
+	err = s.produce(msg, assignTaskTopic)
 	if err != nil {
 		return nil, err
 	}

@@ -1,19 +1,17 @@
-module github.com/vctrl/async-architecture/popug-tasks
+module github.com/vctrl/async-architecture/popug-billing
 
 go 1.17
 
 require (
 	github.com/confluentinc/confluent-kafka-go v1.7.0
-	github.com/golang/protobuf v1.5.2
-	github.com/satori/go.uuid v1.2.0
 	github.com/vctrl/async-architecture/schema v0.0.0-20211123220742-c933ec10d3b8
-	github.com/vctrl/async-architecture/week_2/schema v0.0.0-20211118164827-a66401836c69
 	google.golang.org/grpc v1.42.0
 	gorm.io/driver/postgres v1.2.2
 	gorm.io/gorm v1.22.3
 )
 
 require (
+	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.10.0 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect

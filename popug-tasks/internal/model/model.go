@@ -5,7 +5,7 @@ import (
 	"math/rand"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	"github.com/vctrl/async-architecture/week_2/popug-tasks/internal/db"
+	"github.com/vctrl/async-architecture/popug-tasks/internal/db"
 	tasks2 "github.com/vctrl/async-architecture/week_2/schema/tasks"
 )
 
