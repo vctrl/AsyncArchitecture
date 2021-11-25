@@ -19,9 +19,9 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AnalyticsClient interface {
 	// GetTodayRevenue сколько заработал топ-менеджмент за сегодня
-	GetTodayRevenue(ctx context.Context, in *GetTodayRevenueRequest, opts ...grpc.CallOption) (*GetTodayRevenueResponse, error)
+	GetTodayEarnings(ctx context.Context, in *GetTodayEarningsRequest, opts ...grpc.CallOption) (*GetTodayEarningsResponse, error)
 	// GetUnprofitableCount сколько попугов вышло в минус за сегодня
-	GetUnprofitableCount(ctx context.Context, in *GetUnprofitableCountRequest, opts ...grpc.CallOption) (*GetUnprofitableCountResponse, error)
+	GetNonProfitPopugCount(ctx context.Context, in *GetNonProfitPopugCountRequest, opts ...grpc.CallOption) (*GetNonProfitPopugCountResponse, error)
 	// GetMostExpensiveTask самая дорогая задача за промежуток времени
 	GetMostExpensiveTask(ctx context.Context, in *GetMostExpensiveTaskRequest, opts ...grpc.CallOption) (*GetMostExpensiveTaskResponse, error)
 }
@@ -34,18 +34,18 @@ func NewAnalyticsClient(cc grpc.ClientConnInterface) AnalyticsClient {
 	return &analyticsClient{cc}
 }
 
-func (c *analyticsClient) GetTodayRevenue(ctx context.Context, in *GetTodayRevenueRequest, opts ...grpc.CallOption) (*GetTodayRevenueResponse, error) {
-	out := new(GetTodayRevenueResponse)
-	err := c.cc.Invoke(ctx, "/Analytics/GetTodayRevenue", in, out, opts...)
+func (c *analyticsClient) GetTodayEarnings(ctx context.Context, in *GetTodayEarningsRequest, opts ...grpc.CallOption) (*GetTodayEarningsResponse, error) {
+	out := new(GetTodayEarningsResponse)
+	err := c.cc.Invoke(ctx, "/Analytics/GetTodayEarnings", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *analyticsClient) GetUnprofitableCount(ctx context.Context, in *GetUnprofitableCountRequest, opts ...grpc.CallOption) (*GetUnprofitableCountResponse, error) {
-	out := new(GetUnprofitableCountResponse)
-	err := c.cc.Invoke(ctx, "/Analytics/GetUnprofitableCount", in, out, opts...)
+func (c *analyticsClient) GetNonProfitPopugCount(ctx context.Context, in *GetNonProfitPopugCountRequest, opts ...grpc.CallOption) (*GetNonProfitPopugCountResponse, error) {
+	out := new(GetNonProfitPopugCountResponse)
+	err := c.cc.Invoke(ctx, "/Analytics/GetNonProfitPopugCount", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -66,9 +66,9 @@ func (c *analyticsClient) GetMostExpensiveTask(ctx context.Context, in *GetMostE
 // for forward compatibility
 type AnalyticsServer interface {
 	// GetTodayRevenue сколько заработал топ-менеджмент за сегодня
-	GetTodayRevenue(context.Context, *GetTodayRevenueRequest) (*GetTodayRevenueResponse, error)
+	GetTodayEarnings(context.Context, *GetTodayEarningsRequest) (*GetTodayEarningsResponse, error)
 	// GetUnprofitableCount сколько попугов вышло в минус за сегодня
-	GetUnprofitableCount(context.Context, *GetUnprofitableCountRequest) (*GetUnprofitableCountResponse, error)
+	GetNonProfitPopugCount(context.Context, *GetNonProfitPopugCountRequest) (*GetNonProfitPopugCountResponse, error)
 	// GetMostExpensiveTask самая дорогая задача за промежуток времени
 	GetMostExpensiveTask(context.Context, *GetMostExpensiveTaskRequest) (*GetMostExpensiveTaskResponse, error)
 	mustEmbedUnimplementedAnalyticsServer()
@@ -78,11 +78,11 @@ type AnalyticsServer interface {
 type UnimplementedAnalyticsServer struct {
 }
 
-func (UnimplementedAnalyticsServer) GetTodayRevenue(context.Context, *GetTodayRevenueRequest) (*GetTodayRevenueResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetTodayRevenue not implemented")
+func (UnimplementedAnalyticsServer) GetTodayEarnings(context.Context, *GetTodayEarningsRequest) (*GetTodayEarningsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTodayEarnings not implemented")
 }
-func (UnimplementedAnalyticsServer) GetUnprofitableCount(context.Context, *GetUnprofitableCountRequest) (*GetUnprofitableCountResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUnprofitableCount not implemented")
+func (UnimplementedAnalyticsServer) GetNonProfitPopugCount(context.Context, *GetNonProfitPopugCountRequest) (*GetNonProfitPopugCountResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNonProfitPopugCount not implemented")
 }
 func (UnimplementedAnalyticsServer) GetMostExpensiveTask(context.Context, *GetMostExpensiveTaskRequest) (*GetMostExpensiveTaskResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMostExpensiveTask not implemented")
@@ -100,38 +100,38 @@ func RegisterAnalyticsServer(s grpc.ServiceRegistrar, srv AnalyticsServer) {
 	s.RegisterService(&Analytics_ServiceDesc, srv)
 }
 
-func _Analytics_GetTodayRevenue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetTodayRevenueRequest)
+func _Analytics_GetTodayEarnings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTodayEarningsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AnalyticsServer).GetTodayRevenue(ctx, in)
+		return srv.(AnalyticsServer).GetTodayEarnings(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Analytics/GetTodayRevenue",
+		FullMethod: "/Analytics/GetTodayEarnings",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AnalyticsServer).GetTodayRevenue(ctx, req.(*GetTodayRevenueRequest))
+		return srv.(AnalyticsServer).GetTodayEarnings(ctx, req.(*GetTodayEarningsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Analytics_GetUnprofitableCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetUnprofitableCountRequest)
+func _Analytics_GetNonProfitPopugCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetNonProfitPopugCountRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AnalyticsServer).GetUnprofitableCount(ctx, in)
+		return srv.(AnalyticsServer).GetNonProfitPopugCount(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Analytics/GetUnprofitableCount",
+		FullMethod: "/Analytics/GetNonProfitPopugCount",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AnalyticsServer).GetUnprofitableCount(ctx, req.(*GetUnprofitableCountRequest))
+		return srv.(AnalyticsServer).GetNonProfitPopugCount(ctx, req.(*GetNonProfitPopugCountRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -162,12 +162,12 @@ var Analytics_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*AnalyticsServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetTodayRevenue",
-			Handler:    _Analytics_GetTodayRevenue_Handler,
+			MethodName: "GetTodayEarnings",
+			Handler:    _Analytics_GetTodayEarnings_Handler,
 		},
 		{
-			MethodName: "GetUnprofitableCount",
-			Handler:    _Analytics_GetUnprofitableCount_Handler,
+			MethodName: "GetNonProfitPopugCount",
+			Handler:    _Analytics_GetNonProfitPopugCount_Handler,
 		},
 		{
 			MethodName: "GetMostExpensiveTask",

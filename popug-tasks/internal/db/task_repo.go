@@ -17,13 +17,17 @@ type Task struct {
 }
 
 type TaskRepo interface {
-	Create(ctx context.Context, task *Task) (string, string, error)
 	AssignTo(ctx context.Context, taskID, userID string) error
 	Completed(ctx context.Context, taskID string) error
 	GetAll(ctx context.Context) ([]*Task, error)
 	GetByID(ctx context.Context, id string) (*Task, error)
 	Update(ctx context.Context, task *Task) error
 	DeleteByID(ctx context.Context, id string) error
+
+	Create(ctx context.Context, task *Task) (string, string, error)
+	// todo
+	UpdateByPublicID() error
+	DeleteByPublicID() error
 }
 
 type TaskRepositorySQL struct {
@@ -84,7 +88,7 @@ func (r *TaskRepositorySQL) Completed(ctx context.Context, taskID string) error 
 
 func (r *TaskRepositorySQL) GetByID(ctx context.Context, id string) (*Task, error) {
 	var task Task
-	db := r.db.WithContext(ctx).First(&task, id)
+	db := r.db.WithContext(ctx).First(&task, "id = ?", id)
 	if db.Error != nil {
 		return nil, db.Error
 	}
@@ -107,5 +111,13 @@ func (r *TaskRepositorySQL) DeleteByID(ctx context.Context, id string) error {
 		return db.Error
 	}
 
+	return nil
+}
+
+func (r *TaskRepositorySQL) UpdateByPublicID() error {
+	return nil
+}
+
+func (r *TaskRepositorySQL) DeleteByPublicID() error {
 	return nil
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	uuid "github.com/satori/go.uuid"
 	"log"
 	"net"
 
@@ -42,6 +43,7 @@ func main() {
 				err = proto.Unmarshal(msg.Value, &evt)
 
 				err := users.Create(context, &db.User{
+					ID:       uuid.NewV4().String(),
 					PublicID: evt.GetPublicId(),
 					Login:    evt.GetLogin(),
 					Email:    evt.GetEmail(),

@@ -30,6 +30,8 @@ message Session {
     string user_id = 1;
 
     string login = 2;
+
+    string role = 3;
 }
 
 message RegisterRequest {

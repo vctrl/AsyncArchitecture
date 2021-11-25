@@ -11,6 +11,7 @@ import (
 type Session struct {
 	UserID string `json:"user_id"`
 	Login  string `json:"login"`
+	Role   string `json:"role"`
 	jwt.StandardClaims
 }
 
@@ -30,12 +31,13 @@ func NewJwtSessionManager(privateKey *rsa.PrivateKey, publicKey *rsa.PublicKey) 
 	}
 }
 
-func (jsm *JwtSessionManager) Create(ctx context.Context, userID string, login string) (string, error) {
+func (jsm *JwtSessionManager) Create(ctx context.Context, userID, login, role string) (string, error) {
 	tn := time.Now()
 	expiresAt := tn.Add(jsm.accessTTL)
 	sess := &Session{
 		UserID: userID,
 		Login:  login,
+		Role:   role,
 		StandardClaims: jwt.StandardClaims{
 			IssuedAt:  tn.Unix(),
 			ExpiresAt: expiresAt.Unix(),

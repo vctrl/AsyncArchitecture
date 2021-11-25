@@ -1,12 +1,16 @@
 syntax = "proto3";
 
 service Billing {
-    rpc CreateTransaction(CreateTransactionRequest) returns (CreateTransactionResponse);
+    rpc CreatePlusTransaction(CreatePlusTransactionRequest) returns (CreatePlusTransactionResponse);
+
+    rpc CreateMinusTransaction(CreateMinusTransactionRequest) returns (CreateMinusTransactionResponse);
 
     rpc CloseBillingCycle(CloseBillingCycleRequest) returns (CloseBillingCycleResponse);
+
+    rpc GetTransactionsGroupedByUser(GetTransactionsGroupedByUserRequest) returns (GetTransactionsGroupedByUserResponse)
 }
 
-message CreateTransactionRequest {
+message CreatePlusTransactionRequest {
     string UserId = 1;
 
     string TaskId = 2;
@@ -14,7 +18,19 @@ message CreateTransactionRequest {
     int64 Amount = 3;
 }
 
-message CreateTransactionResponse {
+message CreatePlusTransactionResponse {
+    Status status = 1;
+}
+
+message CreateMinusTransactionRequest {
+    string UserId = 1;
+
+    string TaskId = 2;
+
+    int64 Amount = 3;
+}
+
+message CreateMinusTransactionResponse {
     Status status = 1;
 }
 
@@ -24,6 +40,14 @@ message CloseBillingCycleRequest {
 
 message CloseBillingCycleResponse {
     Status status = 1;
+}
+
+message GetTransactionsGroupedByUserRequest {
+
+}
+
+message GetTransactionsGroupedByUserResponse {
+
 }
 
 message Status {

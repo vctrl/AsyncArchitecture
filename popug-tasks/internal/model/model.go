@@ -2,11 +2,21 @@ package model
 
 import (
 	"context"
+	"github.com/golang/protobuf/proto"
+	"github.com/vctrl/async-architecture/schema/events"
 	"math/rand"
+	"time"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/vctrl/async-architecture/popug-tasks/internal/db"
-	tasks2 "github.com/vctrl/async-architecture/week_2/schema/tasks"
+	tasks2 "github.com/vctrl/async-architecture/schema/tasks"
+)
+
+const (
+	createTaskTopic = "task-create-events"
+	updateTaskTopic = "task-update-events"
+	deleteTaskTopic = "task-delete-events"
+	assignTaskTopic = "task-assign-events"
 )
 
 type Model struct {
@@ -31,7 +41,7 @@ func (m *Model) Shuffle(ctx context.Context) ([]*NewTaskAssignedTo, error) {
 		return nil, err
 	}
 
-	changeInfo := make([]*NewTaskAssignedTo, 0, len(tasks))
+	changes := make([]*NewTaskAssignedTo, 0, len(tasks))
 	for _, task := range tasks {
 		randomUserID := ids[rand.Intn(len(ids))]
 		// todo one transaction
@@ -40,13 +50,36 @@ func (m *Model) Shuffle(ctx context.Context) ([]*NewTaskAssignedTo, error) {
 			return nil, err
 		}
 
-		changeInfo = append(changeInfo, &NewTaskAssignedTo{
+		changes = append(changes, &NewTaskAssignedTo{
 			TaskID:        task.PublicID,
 			NewAssignedTo: randomUserID,
 		})
 	}
 
-	return changeInfo, nil
+	for _, change := range changes {
+		evt1 := &events.TaskUpdatedEvent{
+			PublicId:   &events.StringContainer{Value: change.TaskID},
+			AssignedTo: &events.StringContainer{Value: change.NewAssignedTo},
+		}
+
+		evt2 := &events.TaskAssignedEvent{
+			TaskPublicId:       change.TaskID,
+			AssignedToPublicId: change.NewAssignedTo,
+		}
+
+		err = m.produce(evt1, updateTaskTopic)
+		if err != nil {
+			return nil, err
+		}
+
+		err = m.produce(evt2, assignTaskTopic)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// todo remove
+	return nil, nil
 }
 
 func (m *Model) CreateAndAssignTo(ctx context.Context, description, assignTo string) (publicID string, id string, err error) {
@@ -60,7 +93,33 @@ func (m *Model) CreateAndAssignTo(ctx context.Context, description, assignTo str
 		return "", "", err
 	}
 
+	msg1 := &events.TaskCreatedEvent{
+		PublicId:    publicID,
+		AssignedTo:  assignTo,
+		Description: description,
+		Done:        false,
+	}
+
+	err = m.produce(msg1, createTaskTopic)
+	if err != nil {
+		return "", "", err
+	}
+
+	// dirty hack: we have to wait while task will be created before assign to user
+	time.Sleep(time.Millisecond * 50)
+
 	err = m.Tasks.AssignTo(ctx, id, assignTo)
+	if err != nil {
+		return "", "", err
+	}
+
+	msg2 := &events.TaskAssignedEvent{
+		Meta:               nil,
+		TaskPublicId:       publicID,
+		AssignedToPublicId: assignTo,
+	}
+
+	err = m.produce(msg2, assignTaskTopic)
 	if err != nil {
 		return "", "", err
 	}
@@ -70,6 +129,22 @@ func (m *Model) CreateAndAssignTo(ctx context.Context, description, assignTo str
 
 func (m *Model) MarkAsDone(ctx context.Context, id string) error {
 	err := m.Tasks.Completed(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	task, err := m.Tasks.GetByID(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	msg := &events.TaskCompletedEvent{
+		Meta:               nil,
+		TaskPublicId:       task.PublicID,
+		AssignedToPublicId: task.AssignedTo,
+	}
+
+	err = m.produce(msg, "task-complete-events")
 	if err != nil {
 		return err
 	}
@@ -92,4 +167,25 @@ func (m *Model) GetAll(ctx context.Context) ([]*db.Task, error) {
 	}
 
 	return tasks, nil
+}
+
+func (m *Model) produce(msg proto.Message, topic string) error {
+	evt, err := proto.Marshal(msg)
+	if err != nil {
+		return err
+	}
+
+	err = m.Producer.Produce(&kafka.Message{
+		TopicPartition: kafka.TopicPartition{
+			Topic:     &topic,
+			Partition: kafka.PartitionAny,
+		},
+		Value: evt,
+	}, nil)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

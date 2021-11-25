@@ -2,28 +2,28 @@ syntax = "proto3";
 
 service Analytics {
     // GetTodayRevenue сколько заработал топ-менеджмент за сегодня
-    rpc GetTodayRevenue(GetTodayRevenueRequest) returns (GetTodayRevenueResponse);
+    rpc GetTodayEarnings(GetTodayEarningsRequest) returns (GetTodayEarningsResponse);
 
     // GetUnprofitableCount сколько попугов вышло в минус за сегодня
-    rpc GetUnprofitableCount(GetUnprofitableCountRequest) returns (GetUnprofitableCountResponse);
+    rpc GetNonProfitPopugCount(GetNonProfitPopugCountRequest) returns (GetNonProfitPopugCountResponse);
 
     // GetMostExpensiveTask самая дорогая задача за промежуток времени
     rpc GetMostExpensiveTask(GetMostExpensiveTaskRequest) returns (GetMostExpensiveTaskResponse);
 }
 
-message GetTodayRevenueRequest {
+message GetTodayEarningsRequest {
 
 }
 
-message GetTodayRevenueResponse {
+message GetTodayEarningsResponse {
     Status status = 1;
 }
 
-message GetUnprofitableCountRequest {
+message GetNonProfitPopugCountRequest {
 
 }
 
-message GetUnprofitableCountResponse {
+message GetNonProfitPopugCountResponse {
     Status status = 1;
 }
 

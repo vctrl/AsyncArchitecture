@@ -2,22 +2,12 @@ package api
 
 import (
 	"context"
-
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	"github.com/golang/protobuf/proto"
 	"github.com/vctrl/async-architecture/popug-tasks/internal/db"
 	"github.com/vctrl/async-architecture/popug-tasks/internal/model"
-	"github.com/vctrl/async-architecture/schema/events"
 	"github.com/vctrl/async-architecture/schema/tasks"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-)
-
-const (
-	createTaskTopic = "create-task-events"
-	updateTaskTopic = "update-task-events"
-	deleteTaskTopic = "delete-task-events"
-	assignTaskTopic = "assign-task-events"
 )
 
 type server struct {
@@ -29,9 +19,14 @@ func New(dsn string) tasks.TasksServer {
 	// todo config
 	taskRepo := db.NewTaskRepoSQL(dsn)
 	userRepo := db.NewUserRepositorySQL(dsn)
+	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": "localhost:29092"})
+	if err != nil {
+		panic(err)
+	}
 	mdl := &model.Model{
-		Tasks: taskRepo,
-		Users: userRepo,
+		Tasks:    taskRepo,
+		Users:    userRepo,
+		Producer: p,
 	}
 	return &server{
 		mdl: mdl,
@@ -41,27 +36,6 @@ func New(dsn string) tasks.TasksServer {
 func (s *server) CreateAndAssignTo(ctx context.Context, req *tasks.CreateAndAssignToRequest) (*tasks.CreateAndAssignToResponse, error) {
 	// todo return created
 	publicID, id, err := s.mdl.CreateAndAssignTo(ctx, req.TaskInfo.Description, req.AssignToId)
-	if err != nil {
-		return nil, err
-	}
-
-	msg := &events.TaskCreatedEvent{
-		PublicId:    publicID,
-		AssignedTo:  req.AssignToId,
-		Description: req.TaskInfo.Description,
-		Done:        false,
-	}
-
-	err = s.produce(msg, createTaskTopic)
-	if err != nil {
-		return nil, err
-	}
-
-	msg := &events.TaskAssignedEvent{
-
-	}
-
-	err = s.produce(msg, assignTaskTopic)
 	if err != nil {
 		return nil, err
 	}
@@ -85,22 +59,9 @@ func (s *server) MarkAsDone(ctx context.Context, req *tasks.MarkAsDoneRequest) (
 }
 
 func (s *server) Shuffle(ctx context.Context, req *tasks.ShuffleRequest) (*tasks.ShuffleResponse, error) {
-	changes, err := s.mdl.Shuffle(ctx)
+	_, err := s.mdl.Shuffle(ctx)
 	if err != nil {
 		return nil, err
-	}
-
-	for _, change := range changes {
-		evt := &events.TaskUpdatedEvent{
-			PublicId:   &events.StringContainer{Value: change.TaskID},
-			AssignedTo: &events.StringContainer{Value: change.NewAssignedTo},
-		}
-
-		err = s.produce(evt, updateTaskTopic)
-
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	return &tasks.ShuffleResponse{
@@ -150,17 +111,18 @@ func (s *server) Update(ctx context.Context, req *tasks.UpdateRequest) (*tasks.U
 		return nil, err
 	}
 
-	msg := &events.TaskUpdatedEvent{
-		// todo public id
-		PublicId:    &events.StringContainer{Value: "public_id"},
-		AssignedTo:  &events.StringContainer{Value: req.TaskInfo.AssignedToId},
-		Description: &events.StringContainer{Value: req.TaskInfo.Description},
-		Done:        &events.BoolContainer{Value: req.TaskInfo.Done},
-	}
-	err = s.produce(msg, updateTaskTopic)
-	if err != nil {
-		return nil, err
-	}
+	// todo
+	//msg := &events.TaskUpdatedEvent{
+	//	// todo public id
+	//	PublicId:    &events.StringContainer{Value: "public_id"},
+	//	AssignedTo:  &events.StringContainer{Value: req.TaskInfo.AssignedToId},
+	//	Description: &events.StringContainer{Value: req.TaskInfo.Description},
+	//	Done:        &events.BoolContainer{Value: req.TaskInfo.Done},
+	//}
+	//err = s.produce(msg, updateTaskTopic)
+	//if err != nil {
+	//	return nil, err
+	//}
 
 	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
 }
@@ -172,36 +134,15 @@ func (s *server) Delete(ctx context.Context, req *tasks.DeleteRequest) (*tasks.D
 		return nil, err
 	}
 
-	msg := &events.TaskDeletedEvent{
-		// todo
-		PublicId: nil,
-	}
-	err = s.produce(msg, deleteTaskTopic)
-	if err != nil {
-		return nil, err
-	}
+	// todo
+	//msg := &events.TaskDeletedEvent{
+	//	// todo
+	//	PublicId: "",
+	//}
+	//err = s.produce(msg, deleteTaskTopic)
+	//if err != nil {
+	//	return nil, err
+	//}
 
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
-}
-
-func (s *server) produce(msg proto.Message, topic string) error {
-	evt, err := proto.Marshal(msg)
-	if err != nil {
-		return err
-	}
-
-	err = s.mdl.Producer.Produce(&kafka.Message{
-		TopicPartition: kafka.TopicPartition{
-			Topic:     &topic,
-			Partition: 0,
-			Offset:    0,
-		},
-		Value: evt,
-	}, nil)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

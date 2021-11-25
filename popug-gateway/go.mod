@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/gin-gonic/gin v1.7.4
-	github.com/vctrl/async-architecture/week_2/schema v0.0.0-20211109231557-f3e1a85f5c51
+	github.com/vctrl/async-architecture/schema v0.0.0-20211124023330-5bab94283b9e
 	google.golang.org/grpc v1.42.0
 )
 
@@ -29,4 +29,4 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
 
-replace github.com/vctrl/async-architecture/week_2/schema => ../schema
+replace github.com/vctrl/async-architecture/schema => ../schema

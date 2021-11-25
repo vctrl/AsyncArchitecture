@@ -3,9 +3,10 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/vctrl/async-architecture/week_2/schema/auth"
-	"github.com/vctrl/async-architecture/week_2/schema/tasks"
+	"github.com/vctrl/async-architecture/schema/auth"
+	"github.com/vctrl/async-architecture/schema/tasks"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"log"
@@ -51,6 +52,9 @@ func SessionMiddleware(authClient auth.AuthClient) gin.HandlerFunc {
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
+		c.Set("role", resp.Session.Role)
+		c.Set("login", resp.Session.Login)
+		c.Set("user_id", resp.Session.UserId)
 
 		if resp.Status.GetCode() != int32(codes.OK) {
 			c.AbortWithStatus(http.StatusUnauthorized)
@@ -226,19 +230,28 @@ func main() {
 			return
 		}
 
-		c.JSON(http.StatusOK, &struct{ id string }{resp.Id})
+		c.JSON(http.StatusOK, resp.Id)
 	})
 
 	r.POST("/api/v1/tasks/shuffle", func(c *gin.Context) {
+		// authorize
+		role, _ := c.Get("role")
+		roleStr, _ := role.(string)
+		if roleStr != "manager" && roleStr != "admin" {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
 		ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 		defer cancel()
 		resp, err := gw.tasksClient.Shuffle(ctx, &tasks.ShuffleRequest{})
 		// todo move error handling to func
 		if err != nil {
+			fmt.Println(err.Error())
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
-		if resp.Status.GetCode() != int32(http.StatusOK) {
+		if resp.Status.GetCode() != int32(codes.OK) {
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
@@ -282,6 +295,22 @@ func main() {
 	r.DELETE("/api/v1/task/:id", func(c *gin.Context) {
 
 	})
+
+	// вернуть транзакции, сгрупированные по дням
+	r.GET("/api/v1/billing/transaction/daily", func(c *gin.Context) {
+		// послать  ид пользователя, если рядовой попуг, для фильтрации
+		// или nil, если роль админ или бухгалтер
+	})
+
+	// самая дорогая задача за день, неделю, месяц
+	r.GET("/api/v1/analytics/most-expensive-task")
+
+	// сколько заработал топ-менеджмент за сегодня
+	r.GET("/api/v1/analytics/today-earnings")
+
+	// сколько попугов ушло в минус
+	r.GET("/api/v1/analytics/today-non-profit-popugs")
+
 
 	r.Run()
 }

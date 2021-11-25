@@ -26,7 +26,7 @@ func (m *Model) Login(ctx context.Context, login, password string) (string, erro
 		return "", fmt.Errorf("passwords doesn't match")
 	}
 
-	token, err := m.Sm.Create(ctx, user.ID, user.Login)
+	token, err := m.Sm.Create(ctx, user.ID, user.Login, user.Role)
 	if err != nil {
 		return "", err
 	}

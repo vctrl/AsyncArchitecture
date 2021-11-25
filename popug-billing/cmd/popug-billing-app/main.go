@@ -4,11 +4,17 @@ import (
 	"context"
 	"fmt"
 	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"github.com/golang/protobuf/proto"
+	uuid "github.com/satori/go.uuid"
 	"github.com/vctrl/async-architecture/popug-billing/internal/api"
+	"github.com/vctrl/async-architecture/popug-billing/internal/db"
+	"github.com/vctrl/async-architecture/schema/billing"
+	"github.com/vctrl/async-architecture/schema/events"
 	"google.golang.org/grpc"
 	"log"
 	"math/rand"
 	"net"
+	"time"
 )
 
 const (
@@ -24,44 +30,92 @@ func main() {
 
 	srv := grpc.NewServer()
 
-	postgresDsn := "host=localhost user=postgres password=password dbname=tasks port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+	postgresDsn := "host=localhost user=postgres password=password dbname=billing port=5432 sslmode=disable TimeZone=Asia/Shanghai"
 
-	impl := api.New()
+	impl := api.New(postgresDsn)
 
-	var billingCloseCh chan struct{}
+	billing.RegisterBillingServer(srv, impl)
+	ticker := time.NewTicker(time.Minute)
 
-	billingCloseCh = startBillingCycle()
 	// todo map of channels is needed
 	msgCh := make(chan *kafka.Message)
 
-	go func() {
-		select {
-		case msg := <-msgCh:
-			switch *msg.TopicPartition.Topic {
-			case completeTaskTopic:
-				impl.CreatePlusTransaction()
-			case assignTaskTopic:
-				impl.CreateMinusTransaction()
-			case "task-create-events":
-				// on create event we generate prices
-				// what if on create transaction we don't have task exist?
-				l := -20
-				u := -10
-				cost := l + rand.Intn(u-l+1)
+	tasks := db.NewTaskRepoSQL(postgresDsn)
 
-				l = 20
-				u = 40
-				prize := l + rand.Intn(u-l+1)
-				impl.CreateTask(ctx, cost, prize)
+	go func() {
+		ctx := context.Background()
+		for {
+			// todo cancel with context
+			select {
+			case <-ticker.C:
+				impl.Mdl.CloseBillingCycle(ctx)
+			case msg := <-msgCh:
+				switch *msg.TopicPartition.Topic {
+				case completeTaskTopic:
+					//todo logging
+					fmt.Println("read complete task event")
+					evt := events.TaskCompletedEvent{}
+					err = proto.Unmarshal(msg.Value, &evt)
+					if err != nil {
+						panic(err)
+					}
+					// create transaction, bonus from task
+					_, _, err = impl.Mdl.CreatePlusTransaction(ctx, evt.TaskPublicId, evt.AssignedToPublicId)
+					if err != nil {
+						panic(err)
+					}
+				case assignTaskTopic:
+					fmt.Println("read assign task event")
+					evt := events.TaskAssignedEvent{}
+					err = proto.Unmarshal(msg.Value, &evt)
+
+					if err != nil {
+						panic(err)
+					}
+					// create transaction, take cost from task
+					_, _, err := impl.Mdl.CreateMinusTransaction(ctx, evt.TaskPublicId, evt.AssignedToPublicId)
+					if err != nil {
+						panic(err)
+					}
+				case "task-create-events":
+					// on create event we generate prices
+					// what if on create transaction we don't have task exist?
+					fmt.Println("read create task event")
+					l := -20
+					u := -10
+					cost := l + rand.Intn(u-l+1)
+
+					l = 20
+					u = 40
+					prize := l + rand.Intn(u-l+1)
+					evt := events.TaskCreatedEvent{}
+					err = proto.Unmarshal(msg.Value, &evt)
+
+					if err != nil {
+						panic(err)
+					}
+					_, _, err = tasks.Create(ctx, &db.Task{
+						ID:       uuid.NewV4().String(),
+						PublicID: evt.PublicId,
+						Prize:    prize,
+						Cost:     cost,
+					})
+
+					if err != nil {
+						fmt.Printf("error create user record: %v\n", err.Error())
+						// todo handle err
+					}
+				}
 			}
-		case <-billingCloseCh:
-			impl.CloseBillingCycle()
 		}
+
 	}()
 
 	go subscribe(msgCh)
 
-	// todo close billing cycle on ticker
+	if err := srv.Serve(lis); err != nil {
+		panic(err)
+	}
 
 }
 
@@ -80,7 +134,7 @@ func subscribe(msgCh chan *kafka.Message) error {
 		"user-create-events",
 		//"user-update-events",
 		//"user-delete-events",
-		//"task-create-events",
+		"task-create-events",
 		//"task-update-events",
 		//"task-delete-events",
 		completeTaskTopic,

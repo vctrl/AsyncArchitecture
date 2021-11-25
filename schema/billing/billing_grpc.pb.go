@@ -18,7 +18,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BillingClient interface {
-	CreateTransaction(ctx context.Context, in *CreateTransactionRequest, opts ...grpc.CallOption) (*CreateTransactionResponse, error)
+	CreatePlusTransaction(ctx context.Context, in *CreatePlusTransactionRequest, opts ...grpc.CallOption) (*CreatePlusTransactionResponse, error)
+	CreateMinusTransaction(ctx context.Context, in *CreateMinusTransactionRequest, opts ...grpc.CallOption) (*CreateMinusTransactionResponse, error)
 	CloseBillingCycle(ctx context.Context, in *CloseBillingCycleRequest, opts ...grpc.CallOption) (*CloseBillingCycleResponse, error)
 }
 
@@ -30,9 +31,18 @@ func NewBillingClient(cc grpc.ClientConnInterface) BillingClient {
 	return &billingClient{cc}
 }
 
-func (c *billingClient) CreateTransaction(ctx context.Context, in *CreateTransactionRequest, opts ...grpc.CallOption) (*CreateTransactionResponse, error) {
-	out := new(CreateTransactionResponse)
-	err := c.cc.Invoke(ctx, "/Billing/CreateTransaction", in, out, opts...)
+func (c *billingClient) CreatePlusTransaction(ctx context.Context, in *CreatePlusTransactionRequest, opts ...grpc.CallOption) (*CreatePlusTransactionResponse, error) {
+	out := new(CreatePlusTransactionResponse)
+	err := c.cc.Invoke(ctx, "/Billing/CreatePlusTransaction", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *billingClient) CreateMinusTransaction(ctx context.Context, in *CreateMinusTransactionRequest, opts ...grpc.CallOption) (*CreateMinusTransactionResponse, error) {
+	out := new(CreateMinusTransactionResponse)
+	err := c.cc.Invoke(ctx, "/Billing/CreateMinusTransaction", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +62,8 @@ func (c *billingClient) CloseBillingCycle(ctx context.Context, in *CloseBillingC
 // All implementations must embed UnimplementedBillingServer
 // for forward compatibility
 type BillingServer interface {
-	CreateTransaction(context.Context, *CreateTransactionRequest) (*CreateTransactionResponse, error)
+	CreatePlusTransaction(context.Context, *CreatePlusTransactionRequest) (*CreatePlusTransactionResponse, error)
+	CreateMinusTransaction(context.Context, *CreateMinusTransactionRequest) (*CreateMinusTransactionResponse, error)
 	CloseBillingCycle(context.Context, *CloseBillingCycleRequest) (*CloseBillingCycleResponse, error)
 	mustEmbedUnimplementedBillingServer()
 }
@@ -61,8 +72,11 @@ type BillingServer interface {
 type UnimplementedBillingServer struct {
 }
 
-func (UnimplementedBillingServer) CreateTransaction(context.Context, *CreateTransactionRequest) (*CreateTransactionResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateTransaction not implemented")
+func (UnimplementedBillingServer) CreatePlusTransaction(context.Context, *CreatePlusTransactionRequest) (*CreatePlusTransactionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePlusTransaction not implemented")
+}
+func (UnimplementedBillingServer) CreateMinusTransaction(context.Context, *CreateMinusTransactionRequest) (*CreateMinusTransactionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateMinusTransaction not implemented")
 }
 func (UnimplementedBillingServer) CloseBillingCycle(context.Context, *CloseBillingCycleRequest) (*CloseBillingCycleResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CloseBillingCycle not implemented")
@@ -80,20 +94,38 @@ func RegisterBillingServer(s grpc.ServiceRegistrar, srv BillingServer) {
 	s.RegisterService(&Billing_ServiceDesc, srv)
 }
 
-func _Billing_CreateTransaction_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateTransactionRequest)
+func _Billing_CreatePlusTransaction_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePlusTransactionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(BillingServer).CreateTransaction(ctx, in)
+		return srv.(BillingServer).CreatePlusTransaction(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Billing/CreateTransaction",
+		FullMethod: "/Billing/CreatePlusTransaction",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BillingServer).CreateTransaction(ctx, req.(*CreateTransactionRequest))
+		return srv.(BillingServer).CreatePlusTransaction(ctx, req.(*CreatePlusTransactionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Billing_CreateMinusTransaction_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateMinusTransactionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BillingServer).CreateMinusTransaction(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Billing/CreateMinusTransaction",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BillingServer).CreateMinusTransaction(ctx, req.(*CreateMinusTransactionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -124,8 +156,12 @@ var Billing_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*BillingServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CreateTransaction",
-			Handler:    _Billing_CreateTransaction_Handler,
+			MethodName: "CreatePlusTransaction",
+			Handler:    _Billing_CreatePlusTransaction_Handler,
+		},
+		{
+			MethodName: "CreateMinusTransaction",
+			Handler:    _Billing_CreateMinusTransaction_Handler,
 		},
 		{
 			MethodName: "CloseBillingCycle",

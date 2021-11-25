@@ -27,7 +27,7 @@ type server struct {
 // todo abstract config
 func New(dsn string, kafkaCfg *kafka.ConfigMap) (*server, error) {
 	// todo config and relative path
-	bts, err := ioutil.ReadFile("/Users/viktor/Repos/async-architecture/week_2/popug-auth/jwtRS256.key")
+	bts, err := ioutil.ReadFile("/Users/viktor/Repos/async-architecture/popug-auth/jwtRS256.key")
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func New(dsn string, kafkaCfg *kafka.ConfigMap) (*server, error) {
 		return nil, err
 	}
 
-	bts, err = ioutil.ReadFile("/Users/viktor/Repos/async-architecture/week_2/popug-auth/jwtRS256.key.pub")
+	bts, err = ioutil.ReadFile("/Users/viktor/Repos/async-architecture/popug-auth/jwtRS256.key.pub")
 	if err != nil {
 		return nil, err
 	}
@@ -80,6 +80,7 @@ func (s *server) CheckSession(ctx context.Context, req *auth.CheckSessionRequest
 		Session: &auth.Session{
 			UserId: resp.UserID,
 			Login:  resp.Login,
+			Role:   resp.Role,
 		},
 	}, nil
 }
