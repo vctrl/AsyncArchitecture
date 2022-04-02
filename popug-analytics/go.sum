@@ -1,0 +1,4 @@
+github.com/vctrl/async-architecture v0.0.0-20211124023330-5bab94283b9e h1:4tLDswnkrDJq19l7z8ORv+e0dThUKemcvOhNgp+a+n8=
+github.com/vctrl/async-architecture v0.0.0-20211124023330-5bab94283b9e/go.mod h1:v4GIEp7DG602EHp4Hqbi+JXQnNm6m6DNSc00421zab0=
+github.com/vctrl/async-architecture/schema v0.0.0-20211124023330-5bab94283b9e h1:vAJYFCEbDkgWAJJuCSshspPvTaz8dtbXWFMWYz2s4K0=
+github.com/vctrl/async-architecture/schema v0.0.0-20211124023330-5bab94283b9e/go.mod h1:gjBCbafAP7eqo7rzjqwBWc6xTp8i83s12YbiJ5ObUaY=

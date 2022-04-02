@@ -1,0 +1,112 @@
+syntax = "proto3";
+
+message UserCreatedEvent {
+    Meta meta = 1;
+
+    string public_id = 2;
+
+    string login = 3;
+
+    string email = 4;
+
+    string full_name = 5;
+
+    string role = 6;
+}
+
+message UserUpdatedEvent {
+    Meta meta = 1;
+
+    string public_id = 2;
+
+    string login = 3;
+
+    string email = 4;
+
+    string full_name = 5;
+
+    string role = 6;
+}
+
+message UserDeletedEvent {
+    Meta meta = 1;
+
+    string public_id = 2;
+}
+
+message TaskCreatedEvent {
+    Meta meta = 1;
+
+    string public_id = 2;
+
+    string assigned_to = 3;
+
+    // deprecated: use jira_id and title instead.
+    string description = 4;
+
+    bool done = 5;
+
+    string jira_id = 6;
+
+    string title = 7;
+}
+
+message TaskUpdatedEvent {
+    Meta meta = 1;
+
+    StringContainer public_id = 2;
+
+    StringContainer assigned_to = 3;
+
+    // deprecated: use jira_id and title instead.
+    StringContainer description = 4;
+
+    BoolContainer done = 5;
+
+    StringContainer jira_id = 6;
+
+    StringContainer title = 7;
+}
+
+message TaskDeletedEvent {
+    Meta meta = 1;
+
+    string public_id = 2;
+}
+
+message TaskCompletedEvent {
+    Meta meta = 1;
+
+    string task_public_id = 2;
+
+    string assigned_to_public_id = 3;
+}
+
+message TaskAssignedEvent {
+    Meta meta = 1;
+
+    string task_public_id = 2;
+
+    string assigned_to_public_id = 3;
+}
+
+// StringContainer нужен для того чтобы отличать отсутствие значения(nil) от пустого значения
+message StringContainer {
+    string value = 1;
+}
+
+// BoolContainer нужен для того чтобы отличать отсутствие значения(nil) от пустого значения
+message BoolContainer {
+    bool value = 1;
+}
+
+// Meta служебная информация о событии
+message Meta {
+    string event_id = 1;
+
+    string event_name = 2;
+
+    int64 event_time = 3;
+
+    string producer = 4;
+}

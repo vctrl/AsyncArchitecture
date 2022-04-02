@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+service Analytics {
+    // GetTodayRevenue сколько заработал топ-менеджмент за сегодня
+    rpc GetTodayEarnings(GetTodayEarningsRequest) returns (GetTodayEarningsResponse);
+
+    // GetUnprofitableCount сколько попугов вышло в минус за сегодня
+    rpc GetNonProfitPopugCount(GetNonProfitPopugCountRequest) returns (GetNonProfitPopugCountResponse);
+
+    // GetMostExpensiveTask самая дорогая задача за промежуток времени
+    rpc GetMostExpensiveTask(GetMostExpensiveTaskRequest) returns (GetMostExpensiveTaskResponse);
+}
+
+message GetTodayEarningsRequest {
+
+}
+
+message GetTodayEarningsResponse {
+    Status status = 1;
+}
+
+message GetNonProfitPopugCountRequest {
+
+}
+
+message GetNonProfitPopugCountResponse {
+    Status status = 1;
+}
+
+message GetMostExpensiveTaskRequest {
+    enum Interval {
+        DAY = 0;
+        WEEK = 1;
+        MONTH = 2;
+    }
+
+    Interval interval = 1;
+}
+
+message GetMostExpensiveTaskResponse {
+    Status status = 1;
+
+    // interval_begin начало временного интервала
+    int64 interval_begin = 2;
+
+    // interval_end конец временного интервала
+    int64 interval_end = 3;
+
+    int32 price = 4;
+}
+
+message Status {
+    int32 code = 1;
+
+    string msg = 2;
+}
